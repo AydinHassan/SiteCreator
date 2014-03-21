@@ -35,7 +35,7 @@ do
     shift
 
     case $key in
-        --SiteName)
+        --siteName)
             siteName="$1"
             shift
             ;;
@@ -61,6 +61,11 @@ if [[ -z "$siteName"  || -z "$serverName" ]]; then
 fi
 
 #Load and validate config
+if [[ ! -e "config.sh" ]]; then
+    echo -e "Config file does not exist\n"
+    exit 1
+fi
+
 source "config.sh"
 if [[ -z "$siteDir" ]]; then
     echo -e "Config does not contain Webroot\n"
@@ -72,16 +77,17 @@ if [[ -z "$serverAdmin" ]]; then
     exit 1
 fi
 
-#remove openssl rand config - throws errors when
-#generating password
-if [[ -e ~/.rnd ]]; then
-   sudo rm ~/.rnd
-fi
-
 #must be run as root
 if [[ "$UID" -ne 0 ]]; then
     echo "Please run as root"
     exit 1
+fi
+
+
+#remove openssl rand config - throws errors when
+#generating password
+if [[ -e ~/.rnd ]]; then
+   sudo rm ~/.rnd
 fi
 
 #Validate directories and stuff
