@@ -1,3 +1,4 @@
+#!/bin/sh
 serverAdmin="shane.osbourne8@gmail.com"
 siteDir="/var/www"
 mysqlUser="root"

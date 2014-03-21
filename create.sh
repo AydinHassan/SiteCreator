@@ -182,7 +182,7 @@ sudo service apache2 reload
 
 #mysql
 password=$(openssl rand -base64 20)
-if [ "$createDatabase" == "-d" ]; then
+if [ "$createDatabase" == "true" ]; then
     echo -e "Creating database..\n"
     mysql -u $mysqlUser -p$mysqlPass -e "CREATE DATABASE $siteName; GRANT ALL PRIVILEGES ON $siteName.* TO $siteName@localhost IDENTIFIED BY '$password'"
     echo -e "Database Name: $siteName\n"

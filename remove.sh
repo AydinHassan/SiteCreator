@@ -91,8 +91,6 @@ sudo rm -rf "/var/www/$siteName"
 sudo a2dissite $serverName
 sudo service apache2 reload
 
-mysql -u root -pnodeisthebestphpsux -e "DROP DATABASE $siteName"
-
-if [ "dropDatabase" == "-d" ]; then
+if [ "dropDatabase" == "true" ]; then
     mysql -u $mysqlUser -p$mysqlPass -e "DROP DATABASE $siteName"
 fi
