@@ -123,8 +123,8 @@ if id -u $siteName >/dev/null 2>&1; then
 fi
 
 if [[ "$createDatabase" == "true" ]]; then
-    dbExists=$(mysql --batch --skip-column-names -e "SHOW DATABASES LIKE '"$siteName"';" | grep -q "$siteName"; echo "$?")
-    if [ dbExists -eq 0 ];then
+    dbExists=$(mysql -u $mysqlUser -p$mysqlPass --batch --skip-column-names -e "SHOW DATABASES LIKE '"$siteName"';" | grep -q "$siteName"; echo "$?")
+    if [[ "$dbExists" == "0" ]];then
         echo "A database with the name $siteName already exists. exiting"
         exit 1
     fi
@@ -185,8 +185,8 @@ password=$(openssl rand -base64 20)
 if [ "$createDatabase" == "true" ]; then
     echo -e "Creating database..\n"
     mysql -u $mysqlUser -p$mysqlPass -e "CREATE DATABASE $siteName; GRANT ALL PRIVILEGES ON $siteName.* TO $siteName@localhost IDENTIFIED BY '$password'"
-    echo -e "Database Name: $siteName\n"
-    echo -e "Database User: $siteName@localhost\n"
-    echo -e "Database Password: $password\n"
+    echo -e "Database Name: $siteName"
+    echo -e "Database User: $siteName@localhost"
+    echo -e "Database Password: $password"
 fi 
 
