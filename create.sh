@@ -18,7 +18,7 @@ usage()
      -d                If specified will create a database and user (OPTIONAL)
 
   Config is read from config.sh in the same directory. It should contain
-  the web root and server admin details.
+  the web root and server admin details, and MySQL details if db options is used.
 '
 }
 
@@ -77,12 +77,23 @@ if [[ -z "$serverAdmin" ]]; then
     exit 1
 fi
 
+if [[ "$createDatabase" == "true" ]]; then
+
+    if ! which mysql >/dev/null; then
+        echo -e "MySQL does not exist on the system\n"
+        exit 1
+    fi
+    if [[ -z "$mysqlUser"  || -z "$mysqlPass" ]]; then
+        echo -e "Config does not contain MySQL credentials\n"
+        exit 1
+    fi
+fi
+
 #must be run as root
 if [[ "$UID" -ne 0 ]]; then
     echo "Please run as root"
     exit 1
 fi
-
 
 #remove openssl rand config - throws errors when
 #generating password
@@ -91,12 +102,22 @@ if [[ -e ~/.rnd ]]; then
 fi
 
 #Validate directories and stuff
+if [ ! -d  "$siteDir" ]; then
+    echo -e "Site Directory root does not exist - Is apache installed?\n"
+    exit 1
+fi
+
+if ! which apache2 >/dev/null; then
+    echo -e "Apache2 does not exist on the system\n"
+    exit 1
+fi
+
 if [ -d  "$siteDir/$siteName" ]; then
     echo -e "Site Directory exists - try another\n"
     exit 1
 fi
 
-if id -u $1 >/dev/null 2>&1; then
+if id -u $siteName >/dev/null 2>&1; then
      echo -e "User exists - try another\n"
      exit 1
 fi
@@ -163,7 +184,7 @@ sudo service apache2 reload
 password=$(openssl rand -base64 20)
 if [ "$createDatabase" == "-d" ]; then
     echo -e "Creating database..\n"
-    mysql -u root -pnodeisthebestphpsux -e "CREATE DATABASE $siteName; GRANT ALL PRIVILEGES ON $siteName.* TO $siteName@localhost IDENTIFIED BY '$password'"
+    mysql -u $mysqlUser -p$mysqlPass -e "CREATE DATABASE $siteName; GRANT ALL PRIVILEGES ON $siteName.* TO $siteName@localhost IDENTIFIED BY '$password'"
     echo -e "Database Name: $siteName\n"
     echo -e "Database User: $siteName@localhost\n"
     echo -e "Database Password: $password\n"
